@@ -12,9 +12,9 @@ datadir <- '/Users/dhardy/Dropbox/r_data/web-of-science'
 ## import data
 all <- read.delim(file.path(datadir, "data/slr-risk.txt"), header = TRUE, sep = "\t") %>%
   head(., -2) %>%
-  mutate(count = records, year = as.character(Publication.Years)) %>%
+  mutate(year = as.character(Publication.Years)) %>%
   mutate(year = year(as.Date(year, "%Y"))) %>%
-  select("year", "count")
+  select("year", "records")
 
 # vulnhd <- read.delim("data/vulnhd.txt", header = TRUE, sep = "\t") %>%
 #   head(., -2) %>%
@@ -28,12 +28,12 @@ all <- read.delim(file.path(datadir, "data/slr-risk.txt"), header = TRUE, sep = 
 #   group_by(identity) %>%
 #   arrange(year)
 
-fig <- ggplot(filter(df, year < 2018 & year > 1964), aes(year, records)) + 
-  geom_point(aes(shape = identity), size = 2, color = "black") + 
-  scale_y_continuous(name = "Records (1000s)", limits = c(0,12), breaks = seq(0, 12, 2),
-                     sec.axis = sec_axis(~., breaks = seq(0,12,2), labels = NULL)) + 
-  scale_x_continuous(name = "Year", breaks = seq(1965, 2015, 10),
-                     sec.axis = sec_axis(~., breaks = seq(1965,2015, 10), labels = NULL)) + 
+fig <- ggplot(filter(all, year <= 2020 & year > 1964), aes(year, records/100)) + 
+  geom_point(aes(), size = 2, color = "black") + 
+  scale_y_continuous(name = "Records (100s)", limits = c(0,18), breaks = seq(0, 16, 2),
+                     sec.axis = sec_axis(~., breaks = seq(0,18,2), labels = NULL)) + 
+  scale_x_continuous(name = "Year", breaks = seq(1970, 2020, 10),
+                     sec.axis = sec_axis(~., breaks = seq(1970,2020, 10), labels = NULL)) + 
   scale_shape_manual(name = "", values = c(18,1), labels = c("Sea level rise", "Risk")) + 
   theme(legend.position = c(0.35,0.85),
         legend.key = element_rect(fill = "white"),
