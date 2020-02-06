@@ -16,7 +16,7 @@ slr <- read.delim(file.path(datadir, "data/slr.txt"), header = TRUE, sep = "\t")
   mutate(year = year(as.Date(year, "%Y")), id = 'slr') %>%
   select("year", "records", 'id')
 
-risk <- read.delim(file.path(datadir, "data/slr-risk.txt"), header = TRUE, sep = "\t") %>%
+risk <- read.delim(file.path(datadir, "data/slr-risk-vuln-exp.txt"), header = TRUE, sep = "\t") %>%
   head(., -2) %>%
   mutate(year = as.character(Publication.Years)) %>%
   mutate(year = year(as.Date(year, "%Y")), id = 'risk') %>%
@@ -28,7 +28,7 @@ pop <- read.delim(file.path(datadir, "data/slr-pop.txt"), header = TRUE, sep = "
   mutate(year = year(as.Date(year, "%Y")), id = 'pop') %>%
   select("year", "records", 'id')
 
-poprisk <- read.delim(file.path(datadir, "data/slr-pop-risk.txt"), header = TRUE, sep = "\t") %>%
+poprisk <- read.delim(file.path(datadir, "data/slr-risk-vuln-exp-pop.txt"), header = TRUE, sep = "\t") %>%
   head(., -2) %>%
   mutate(year = as.character(Publication.Years)) %>%
   mutate(year = year(as.Date(year, "%Y")), id = 'pop+risk') %>%
@@ -37,7 +37,7 @@ poprisk <- read.delim(file.path(datadir, "data/slr-pop-risk.txt"), header = TRUE
 # slr <- slr[1,] %>%
 #   mutate(year = NA, records = NA, id = 'slr')
 
-all <- rbind(risk, pop, poprisk, slr) %>%
+all <- rbind(poprisk, risk, pop, slr) %>%
   #mutate(id = factor(id, levels = c('slr', 'risk', 'pop', 'pop+risk'))) %>%
   mutate(id = factor(id, levels = c('pop+risk', 'risk', 'pop', 'slr')))
 
@@ -78,7 +78,8 @@ fig_col <- ggplot() +
   geom_col(aes(year, records, fill = 'black'), filter(all, id == 'pop+risk')) + 
   #geom_bar(stat = "identity", position = "identity", alpha=0.9) +
   scale_fill_manual(name = "", values = rev(c('grey90', 'grey60', 'grey30', 'black')), labels =
-                     rev(c("Sea-Level Rise\nOR Sea Level Rise", "AND Risk", "AND Population", "AND Population AND Risk"))) +
+                     rev(c("Sea-Level Rise\nOR Sea Level Rise", "AND Population", "AND Risk OR Vulnerability OR Exposure", 
+                           "AND Risk OR Vulnerability OR Exposure AND Population"))) +
   scale_y_continuous(name = "No. of Records", limits = c(0,1600), breaks = seq(0, 1600, 200),
                      minor_breaks = seq(0, 1600, 100),
                      sec.axis = sec_axis(~., breaks = seq(0,1600,200), labels = NULL),
@@ -86,9 +87,10 @@ fig_col <- ggplot() +
   scale_x_continuous(name = "Year", breaks = seq(1990, 2020, 5),
                      sec.axis = sec_axis(~., breaks = seq(1990,2020, 5), labels = NULL)
                      ) + 
-  theme(legend.position = c(0.3,0.8),
+  theme(legend.position = c(0.44,0.87),
         # legend.key = element_rect(fill = "transparent", color = "transparent"),
-        # legend.background = element_rect(fill = "transparent"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.text = element_text(size = 8),
         panel.background = element_rect(fill = "transparent", color = "transparent"),
         panel.grid = element_blank(),
         plot.background = element_rect(fill = "transparent", color = "transparent"),
@@ -98,12 +100,12 @@ fig_col <- ggplot() +
         axis.text.y = element_text(margin = unit(c(0.5,0.5,0.5,0.5), "cm")),
         axis.ticks.length = unit(-0.1, "cm"),
         axis.ticks = element_line(color = "black"),
-        text = element_text(size = 10, color = "black"),
+        text = element_text(size = 9, color = "black"),
         plot.margin = margin(1,1,0.5,0.5, "cm")
   )
-fig_col
+# fig_col
 
-tiff(file.path(datadir, '/figures/slr-pop-risk-columns.tiff'), width=5, height=5, units="in", res = 300, compression = 'lzw')
+tiff(file.path(datadir, '/figures/slr-pop-risk-columns.tiff'), width=5, height=5, units="in", res = 150, compression = 'lzw')
 fig_col
 dev.off()
 
